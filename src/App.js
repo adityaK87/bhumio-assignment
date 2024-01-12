@@ -6,6 +6,7 @@ function App() {
 	const [imagePath, setImagePath] = useState("");
 	const [text, setText] = useState("");
 	const [progress, setProgress] = useState(0);
+	const [isProgress, setIsProgress] = useState(false);
 
 	const handleChange = (event) => {
 		setImagePath(URL.createObjectURL(event.target.files[0]));
@@ -14,6 +15,9 @@ function App() {
 	const handleClick = () => {
 		Tesseract.recognize(imagePath, "eng", {
 			logger: ({ status, progress }) => {
+				if (progress * 100 !== 100) {
+					setIsProgress(true);
+				}
 				setProgress(progress * 100);
 			},
 		})
@@ -23,7 +27,7 @@ function App() {
 			.then((result) => {
 				// Get Confidence score
 				console.log("Result", result.data);
-				let confidence = result.confidence;
+				// let confidence = result.confidence;
 
 				let text = result.data.text;
 				setText(text);
@@ -41,7 +45,7 @@ function App() {
 				<div className="text-box">
 					<p> {text} </p>
 				</div>
-				<progress max={100} value={progress} />
+				{isProgress && <progress max={100} value={progress} />}
 				<input type="file" onChange={handleChange} />
 				<button onClick={handleClick} style={{ height: 50 }}>
 					convert to text
